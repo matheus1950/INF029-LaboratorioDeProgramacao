@@ -50,6 +50,15 @@ int cadastrar_geral(int qtd_aluno, lista_geral aluno[]);
 
 int cadastro_disciplina(disciplina disciplina[], int qtd_disciplina);
 
+// TODO a ideia é boa também mas tome cuidado com a quantidade de dados lidos do usuário, tem lugares que você ta só colocando o mínimo necessário e mesmo usando essa função de limpeza do buffer pode dar problema caso esqueça de usar
+// eu acho que é mais jogo você ter uma função de leitura de dados no geral numa função e retornar a string lida (ou receber ela como parametro e modificá-la),
+// tem várias formas de solucionar isso também uma simples também seja funções de:
+// lerString(.....)
+// lerNumero(.....)
+// lerData(.....)
+// lerCPF(.....)
+//
+// assim talvez até nem precise ter funções de validação dos valores já que poderia incluir nas próprias funções de leitura
 void limpa_buffer(void) {
   int ch;
   while ((ch = fgetc(stdin)) != EOF && ch != '\n') {
@@ -57,8 +66,10 @@ void limpa_buffer(void) {
 }
 
 int main(void) {
-  
-  int menu, matricula, i, opcao_aluno, opcao_professor, opcao_disciplina,
+  // TODO primeira dica, inicialize todas as variaveis com um valor, imagine um
+  // valor default ou um que caso tenha ele vai ser considerado invalido para
+  // poder debuggar melhor
+  int menu, matricula, i, opcao_aluno, opcao_professor, opcao_disciplina, 
   qtd_aluno = 0, qtd_professor = 0, qtd_disciplina = 0, excluir, sair, cont, j;
   char aux_nome[MAX_NOME], aux[MAX_NOME];
   lista_geral aluno[MAX_ALUNO], aluno_auxiliar[MAX_ALUNO], professor[MAX_PROFESSOR], professor_auxiliar[MAX_PROFESSOR];
@@ -84,27 +95,27 @@ int main(void) {
 
         switch (opcao_aluno) {
         case 1: {
-            printf("Listar alunos:\n\n");
+          printf("Listar alunos:\n\n");
           
-            listar(qtd_aluno, aluno);
+          listar(qtd_aluno, aluno);
           
-            break;
+          break;
         }
 
         case 2: {
-            printf("Entrou na opção listar aluno por sexo!\n\n");
+          printf("Entrou na opção listar aluno por sexo!\n\n");
           
-            listar_sexo(qtd_aluno, aluno);
+          listar_sexo(qtd_aluno, aluno);
           
-            break;
+          break;
         }
 
         case 3: {
-            printf("Listar alunos por nome:\n\n");
-    
-            listar_nome(aluno_auxiliar, qtd_aluno, aluno);
-              
-            break;
+          printf("Listar alunos por nome:\n\n");
+
+          listar_nome(aluno_auxiliar, qtd_aluno, aluno);
+          
+          break;
         }
 
         case 4: {
@@ -133,199 +144,203 @@ int main(void) {
         }
 
         case 6: {
-            printf("Excluir aluno\n\n");
-    
-            printf("Insira a matrícula do aluno que deseja excluir:\n");
-            scanf("%i", &excluir);
+          printf("Excluir aluno\n\n");
 
-          
-            char excluido[MAX_NOME] = "Excluido";
+          printf("Insira a matrícula do aluno que deseja excluir:\n");
+          scanf("%i", &excluir);
 
-          
-            for (i = 0; i < MAX_ALUNO; i++) {
-                if (aluno[i].matricula == excluir) {
-                    printf("Aluno excluído!\n");
-                    cont = i;
+          // é estranho você mudar o nome para excluido, vai perder praticamente
+          // toda a vantagem de nao o apagar do array simplesmente, talvez seja
+          // uma boa repensar isso
+          char excluido[MAX_NOME] = "Excluido";
 
-                    while (cont < MAX_ALUNO) { 
-                        if(aluno[cont+1].existe == 1) {  
+          // TODO corrigir condicional de parada
+          for (i = 0; i < MAX_ALUNO; i++) {
+            if (aluno[i].matricula == excluir) {
+              printf("Aluno excluído!\n");
+              cont = i;
+
+              while (cont < MAX_ALUNO) { // esse loop daqui pede por problema também, condição de execução é problemática (mesmo caso acima)
+                if(aluno[cont+1].existe == 1) {  // nao entendi também a motivação para fazer isso
                 
-                            aluno[cont].matricula = aluno[cont + 1].matricula;
-                            strcpy(aluno[cont].nome, aluno[cont + 1].nome);
-                            aluno[cont].sexo[0] = aluno[cont + 1].sexo[0];
-                            cont++;
-                        }
-                    }
-
-                    aluno[cont].matricula = -5;
-
-                    strcpy(aluno[cont].nome, excluido);
-
-            
-                    aluno[cont].sexo[0] = -5; 
-
-                    qtd_aluno--;
-                
-                    break;
-                    
-                } else if (i == MAX_ALUNO - 1) {
-                    printf("Aluno não encontrado!\n");
+                    aluno[cont].matricula = aluno[cont + 1].matricula;
+                    strcpy(aluno[cont].nome, aluno[cont + 1].nome);// nada garante que o aluno na posicao cont + 1 exista
+                    aluno[cont].sexo[0] = aluno[cont + 1].sexo[0];
+                    cont++;
                 }
+              }
+
+              aluno[cont].matricula = -5;
+
+              strcpy(aluno[cont].nome, excluido);
+
+            // colocar um valor negativo num caractere não é uma prática muito boa, poderia ser 0 por exemplo que teria o mesmo efeito só que não faria uso de valor negativo
+              aluno[cont].sexo[0] = -5; //-5 é valor arbitrário
+
+              qtd_aluno--;
+              break;
+            } else if (i == MAX_ALUNO - 1) {
+              printf("Aluno não encontrado!\n");
             }
+          }
           break;
         }
 
         case 7: {
-            printf("Atualizar aluno\n\n");
-            printf("Digite a matrícula\n");
-            scanf("%i", &matricula);
+          printf("Atualizar aluno\n\n");
+          printf("Digite a matrícula\n");
+          scanf("%i", &matricula);
 
-            int guarda;
-            int sim_nao;
+          int guarda;
 
-            for (i = 0; i <= MAX_ALUNO; i++) {
-                if (matricula == aluno[i].matricula && aluno[i].matricula != 0) {
-                    guarda = i;
-                    printf("Aluno(%i) encontrado!\n", guarda);
-                    printf("Atualizar a matrícula do aluno?(1 - Sim / 2 - Não)\n");
+          for (i = 0; i <= MAX_ALUNO; i++) {
+            if (matricula == aluno[i].matricula && aluno[i].matricula != 0) {
+              guarda = i;
+              printf("Aluno(%i) encontrado!\n", guarda);
+              printf("Atualizar a matrícula do aluno?(1 - Sim / 2 - Não)\n");
 
-                    do {
-                        scanf("%i", &sim_nao);
-                        if (sim_nao != (1 && 2)) {
-                            printf("Digito incorreto, digite 1(Sim) ou 2(Não)!\n");
-                        }
-                        
-                    } while (sim_nao != (1 && 2));
+              int sim_nao;
 
-                    switch (sim_nao) {
-                        case 1: {
-                            aluno[guarda].matricula = matricula;
-                            printf("Matrícula atualizada com sucesso!\n\n");
-                        }
-                        case 2: {
-                            break;
-                        }
-                    }
-                } else if (i == MAX_ALUNO) {
-              printf("Aluno não encontrado!\n");
+              do {
+                scanf("%i", &sim_nao);
+                if (sim_nao != (1 && 2)) {
+                  printf("Digito incorreto, digite 1(Sim) ou 2(Não)!\n");
                 }
+              } while (sim_nao != (1 && 2));
+
+              switch (sim_nao) {
+              case 1: {
+                aluno[guarda].matricula = matricula;
+                printf("Matrícula atualizada com sucesso!\n\n");
+              }
+              case 2: {
+                break;
+              }
+              }
+            } else if (i == MAX_ALUNO) {
+              printf("Aluno não encontrado!\n");
             }
+          }
         }
 
+        default: {
+          printf("\nOpção inválida - retorne ao menu!\n\n");
+          break;
+        }
+        }
+      } while (opcao_aluno > 0 && opcao_aluno < 8);
+      break;
+    }
+
+    case 2: {
+      printf("Entrou na opção professor!\n\n");
+
+      do {
+
+        opcao_professor = menuprofessor();
+
+        switch (opcao_professor) {
+        case 1: {
+            printf("Lista de professores:\n\n");
+          
+            listar(qtd_professor, professor);
+            
+            break;
+        }
+        case 2: {
+          printf("Lista de professores por sexo:\n\n");
+          
+          listar_sexo(qtd_professor, professor);
+          
+          break;
+        }
+        case 3: {
+            printf("Lista de professores por nome:\n\n");
+            
+            listar_nome(professor_auxiliar, qtd_professor, professor);
+            
+            break;
+        }
+        case 4: {
+            printf("Lista de professores por data de nascimento:\n\n");
+          
+            listar_data(professor_auxiliar, qtd_professor, professor);
+            
+            break;
+        }
+        case 5: {
+            printf("Cadastrar professor:\n\n");
+            
+            if(qtd_professor >= MAX_PROFESSOR){
+                printf("\n(!aviso)Número máximo de alunos atingido, exclua algum aluno!\n\n");
+                break;
+            }
+            
+            if(cadastrar_geral(qtd_professor, professor) == -2){
+                professor[qtd_professor].existe = 1;
+                qtd_professor++;
+            }
+            
+            printf("\nProfessor Cadastrado com sucesso!\n\n");
+        
+            break;
+        }
         default: {
             printf("\nOpção inválida - retorne ao menu!\n\n");
             break;
         }
         }
-        } while (opcao_aluno > 0 && opcao_aluno < 8);
-        break;
-    }
-
-    case 2: {
-        printf("Entrou na opção professor!\n\n");
-
-        do {
-
-            opcao_professor = menuprofessor();
-    
-            switch (opcao_professor) {
-                case 1: {
-                    printf("Lista de professores:\n\n");
-                  
-                    listar(qtd_professor, professor);
-                    
-                    break;
-                }
-                case 2: {
-                    printf("Lista de professores por sexo:\n\n");
-                      
-                    listar_sexo(qtd_professor, professor);
-                      
-                    break;
-                }
-                case 3: {
-                    printf("Lista de professores por nome:\n\n");
-                    
-                    listar_nome(professor_auxiliar, qtd_professor, professor);
-                    
-                    break;
-                }
-                case 4: {
-                    printf("Lista de professores por data de nascimento:\n\n");
-                  
-                    listar_data(professor_auxiliar, qtd_professor, professor);
-                    
-                    break;
-                }
-                case 5: {
-                    printf("Cadastrar professor:\n\n");
-            
-                    if(qtd_professor >= MAX_PROFESSOR){
-                        printf("\n(!aviso)Número máximo de alunos atingido, exclua algum aluno!\n\n");
-                        break;
-                    }
-            
-                    if(cadastrar_geral(qtd_professor, professor) == -2){
-                        professor[qtd_professor].existe = 1;
-                        qtd_professor++;
-                    }
-                
-                    printf("\nProfessor Cadastrado com sucesso!\n\n");
-            
-                    break;
-                }
-                default: {
-                    printf("\nOpção inválida - retorne ao menu!\n\n");
-                    break;
-                }
-            }
-        } while (opcao_professor < 8 && opcao_professor > 0);
+      } while (opcao_professor < 8 && opcao_professor > 0);
       break;
     }
 
     case 3: {
-        printf("Entrou na opção disciplina!\n\n");
+      printf("Entrou na opção disciplina!\n\n");
 
-        do {
-            printf("1 - Listar disciplinas(dados sem os alunos:\n");
-            printf("2 - Listar UMA disciplina(todos os dados, incluindo os alunos):\n");
-            printf("3 - Cadastrar uma disciplina\n");
-            printf("(!)Qualquer outro valor irá retornar ao menu principal!\n");
-    
-            scanf("%i", &opcao_disciplina);
-            switch (opcao_disciplina) {
-                case 1: {
-                    printf("Lista de disciplinas(apenas as disciplinas):\n\n");
-                    break;
-                }
-                case 2: {
-                    printf("Lista de UMA disciplina(incluindo os alunos):\n\n");
-                    break;
-                }
-                case 3: {
-                    printf("Cadastrar disciplina(incluindo respectivos professores e alunos):\n\n"); //separar as funções depois
-                    
-                    if(cadastro_disciplina(disciplina, qtd_disciplina) == -2){
-                        qtd_disciplina++;
-                    }
-                    
-                    break;
-                }
-                default: {
-                    printf("\nOpção inexistente - retorne ao menu!\n\n");
-                    break;
-                }
+      do {
+        printf("1 - Listar disciplinas(dados sem os alunos:\n");
+        printf("2 - Listar UMA disciplina(todos os dados, incluindo os alunos):\n");
+        printf("3 - Cadastrar uma disciplina\n");
+        printf("4 - Inserir aluno ou professor numa disciplina\n");
+        printf("(!)Qualquer outro valor irá retornar ao menu principal!\n");
+
+        scanf("%i", &opcao_disciplina);
+        switch (opcao_disciplina) {
+        case 1: {
+            printf("Lista de disciplinas(apenas as disciplinas):\n\n");
+            break;
+        }
+        case 2: {
+            printf("Lista de UMA disciplina(incluindo os alunos):\n\n");
+            break;
+        }
+        case 3: {
+            printf("Cadastrar disciplina:\n\n");
+            
+            if(cadastro_disciplina(disciplina, qtd_disciplina) == -2){
+                qtd_disciplina++;
             }
-        } while (opcao_disciplina < 4 && opcao_disciplina > 0);
-        break;
+            
+            break;
+        }
+        case 4: {
+            printf("Inserir aluno numa disciplina\n\n");
+            break;
+        }
+        default: {
+            printf("\nOpção inexistente - retorne ao menu!\n\n");
+            break;
+        }
+        }
+      } while (menu < 4 && menu > 0);
+      break;
     }
 
     default: {
       printf("Valor errado!\n\n");
     }
-    
     }
- } while (menu != -1);
+  } while (menu != -1);
 }
 
 
@@ -348,7 +363,7 @@ int menugeral() {
 
 int menualuno() {
 
-    int opcao_aluno;
+int opcao_aluno;
 
     printf("1 - Listar alunos\n");
     printf("2 - Listar alunos por sexo\n");
@@ -366,7 +381,7 @@ int menualuno() {
 
 int menuprofessor() {
 
-    int opcao_professor;
+int opcao_professor;
 
     printf("1 - Listar professores\n");
     printf("2 - Listar professores por sexo\n");
@@ -384,7 +399,6 @@ int menuprofessor() {
 
 
 void data_nascimento(int *dia, int *mes, int *ano){
-    
     printf("Cadastrar data de nascimento:\n");
 
     printf("Cadastrar dia:\n");
@@ -442,8 +456,8 @@ void data_nascimento(int *dia, int *mes, int *ano){
 }
 
 void cadastro_sexo(char *sexo){
-  
-    printf("Cadastrar sexo(M - Masculino / F - Feminino)\n");
+  // TODO ter um validador de sexo também (mesmo caso da data), tirar essa lógica daqui (ainda mais considerando que além de cadastrar o sexo do aluno você teria que fazer o mesmo para os professores)
+printf("Cadastrar sexo(M - Masculino / F - Feminino)\n");
     do {
         fgets(sexo, 2, stdin);
 
@@ -456,7 +470,6 @@ void cadastro_sexo(char *sexo){
 }
 
 void cadastro_cpf(char *cpf){
-    
     int i, cpf_invalido;
     
     printf("Cadastrar CPF(11 digitos):\n");
@@ -488,14 +501,13 @@ void cadastro_cpf(char *cpf){
 
 
 int cadastrar_geral(int qtd_aluno, lista_geral aluno[]){
-    
     int cpf_invalido, i;
-    
+    // TODO criar aluno temporario e ter uma função de validação dos dados em uma nova função, assim evita que "lixo" (dados incompletos ou errados) seja colocado no array de alunos
     
     printf("Cadastrar matrícula\n");
     scanf("%i", &aluno[qtd_aluno].matricula);
     
-    data_nascimento(&aluno[qtd_aluno].dia, &aluno[qtd_aluno].mes, &aluno[qtd_aluno].ano); 
+    data_nascimento(&aluno[qtd_aluno].dia, &aluno[qtd_aluno].mes, &aluno[qtd_aluno].ano); //funcao data
     printf("Cadastrar nome\n");
     
     getchar();
@@ -510,9 +522,9 @@ int cadastrar_geral(int qtd_aluno, lista_geral aluno[]){
     
     printf("%li\n", strlen(aluno[qtd_aluno].nome));
     
-    cadastro_sexo(aluno[qtd_aluno].sexo); 
+    cadastro_sexo(aluno[qtd_aluno].sexo); // funcao sexo
     
-    cadastro_cpf(aluno[qtd_aluno].cpf);  
+    cadastro_cpf(aluno[qtd_aluno].cpf);  //funcao cpf
 
     limpa_buffer();
     
@@ -526,7 +538,8 @@ void listar(int qtd_aluno, lista_geral aluno[]){
     if (qtd_aluno == 0) {
         printf("A lista de alunos está vazia\n\n");
     }
-   
+        // corrigir isso para testes...
+        // for (i = 0; i <= MAX_ALUNO; i++) {
     for (i = 0; i < qtd_aluno; i++) {
         if(aluno[i].existe == 1){
             printf("Matrícula: %i - (%i) %s\n", aluno[i].matricula, i, aluno[i].nome);
@@ -670,8 +683,8 @@ void listar_nome(lista_geral aluno_auxiliar[], int qtd_aluno, lista_geral aluno[
         }
 
         for (i = 0; i < qtd_aluno; i++) {
-            for (j = 1; j < qtd_aluno; j++) {       
-                if ((strcmp(aluno_auxiliar[i].nome, aluno_auxiliar[j].nome) > 0) && aluno[j].existe == 1) {    
+            for (j = 1; j < qtd_aluno; j++) {       //criar uma lixeira para os alunos/profs excluidos(guardar matricula)
+                if ((strcmp(aluno_auxiliar[i].nome, aluno_auxiliar[j].nome) > 0) && aluno[j].existe == 1) {    // posso utilizar a struct antiga como referência
                     strcpy(aux, aluno_auxiliar[i].nome);
                     strcpy(aluno_auxiliar[i].nome, aluno_auxiliar[j].nome);
                     strcpy(aluno_auxiliar[j].nome, aux);
