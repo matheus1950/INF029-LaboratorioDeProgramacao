@@ -485,7 +485,15 @@ para poder liberar todos os espaços de memória das estruturas auxiliares.
 
 void finalizar()
 {
-  free(vetorPrincipal->vetorAux);
+  
+    for(int i = 0; i < TAM; i++){
+      if(vetorPrincipal[i].vetorAux){
+        if(vetorPrincipal[i].tamanhoAtual){
+          free(vetorPrincipal[i].vetorAux);
+        }
+      }
+    }
+    
 }
 
 int tamanhos_somados(){
