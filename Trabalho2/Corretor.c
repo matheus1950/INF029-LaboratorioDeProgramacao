@@ -18,23 +18,14 @@ void testeListaEncadeada();
 int main()
 {
     inicializar();
-      printf("-----------------------Inserir s/ nada--------------------------------\n");
     testeInserirSemNada();
-     printf("-----------------------Criar estrutura-----------------------------\n");
     testeCriarEstrutura();
-     printf("-------------------------Inserir com estrutura-----------------------\n");
     testeInserirComEstrutura();
-      printf("-------------------------Excluir---------------------------------\n");
     testeExcluir();
-     printf("------------------------Excluir Nº especifico-----------------------\n");
     testeExcluirNumeroEspecifico();
-      printf("-------------------------Listar--------------------------------\n");
     testeListar();
-      printf("-----------------------Return todos Nº------------------------------\n");
     testeRetornarTodosNumeros();
-     printf("-----------------Mudar tamanho da estrutura-----------------\n");
     testeMudarTamanhoEstrutura();
-      printf("--------------------------Lista encadeada-------------------------\n");
     testeListaEncadeada();
     finalizar();
 }

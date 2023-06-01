@@ -27,17 +27,14 @@ int criarEstruturaAuxiliar(int posicao, int tamanho)
 {
     // se posição é um valor válido {entre 1 e 10}
     if(posicao < 1 || posicao > 10){
-      printf("Posicao invalida\n");
       return POSICAO_INVALIDA;
     }
     // o tamanho nao pode ser menor que 1
     if(tamanho < 1){
-      printf("Tamanho invalido\n");
       return TAMANHO_INVALIDO;
     }
     // a posicao pode já existir estrutura auxiliar
     if(vetorPrincipal[posicao - 1].vetorAux){
-      printf("JA TEM ESTRUTURA\n");
       return JA_TEM_ESTRUTURA_AUXILIAR;
     }
   
@@ -49,11 +46,9 @@ int criarEstruturaAuxiliar(int posicao, int tamanho)
       
     // o tamanho ser muito grande
     if(!vetorPrincipal[posicao - 1].vetorAux){
-      printf("SEM ESPAÇO DE MEMORIA\n");
       return SEM_ESPACO_DE_MEMORIA;
     }
   
-    printf("Sucesso!\n");
     return SUCESSO;
 }
 
@@ -135,7 +130,7 @@ int excluirNumeroDoFinaldaEstrutura(int posicao)
      retorno = ESTRUTURA_AUXILIAR_VAZIA;
      
     else{
-      vetorPrincipal[posicao - 1].vetorAux[atual - 1] = 0; 
+      vetorPrincipal[posicao - 1].vetorAux[atual - 1] = 0;
       vetorPrincipal[posicao - 1].tamanhoAtual--;
     }
       
@@ -261,10 +256,6 @@ int getDadosOrdenadosEstruturaAuxiliar(int posicao, int vetorAux[])
     }
 
     retorno = SUCESSO;
-  
-   /* for(int i = 0; i < atual; i++){
-      printf("VetorAuxiliar[%i] = %i\n", i, vetorAux[i]);
-    }  */
     
     return retorno;
 }
@@ -285,7 +276,6 @@ int getDadosDeTodasEstruturasAuxiliares(int vetorAux[])
 
     for(int i = 0; i < TAM; i++){
       if(vetorPrincipal[i].vetorAux){
-        //printf("Vetores existentes: %i\n", i);
         if(vetorPrincipal[i].tamanhoAtual){
           nao_vazia++;        
         }
@@ -293,7 +283,6 @@ int getDadosDeTodasEstruturasAuxiliares(int vetorAux[])
     }
   
     if(!nao_vazia){
-      //printf("nao_vazia: %i\n", nao_vazia);
       return TODAS_ESTRUTURAS_AUXILIARES_VAZIAS;
     }
   
@@ -305,17 +294,12 @@ int getDadosDeTodasEstruturasAuxiliares(int vetorAux[])
       if(vetorPrincipal[cont].vetorAux){
         for(i = 0; i < atual; i++, j++){
           vetorAux[j] = vetorPrincipal[cont].vetorAux[i];
-          //printf("vetor auxiliar[%i] = %i\n", j, vetorAux[j]);
         }
       }
     }
   
     retorno = SUCESSO;
   
-   /* for(int i = 0; i < atual; i++){
-      printf("VetorAuxiliar[%i] = %i\n", i, vetorAux[i]);
-    }  */
-    
     return retorno;
 }
 
@@ -344,7 +328,6 @@ int getDadosOrdenadosDeTodasEstruturasAuxiliares(int vetorAux[])
         }
       }
   
-  
     return retorno;
 }
 
@@ -362,7 +345,6 @@ Rertono (int)
 int modificarTamanhoEstruturaAuxiliar(int posicao, int novoTamanho)
 {
   int novoTamanhoTotal = novoTamanho + vetorPrincipal[posicao - 1].tamanhoTotal;
-  //printf("NovoTamanho : %i + TamanhoTotal: %i = novoTamanhoTotal : %i\n", novoTamanho, vetorPrincipal[posicao - 1].tamanhoTotal, novoTamanhoTotal);
   
   if(ehPosicaoValida(posicao) == POSICAO_INVALIDA){
       return POSICAO_INVALIDA;
@@ -380,12 +362,11 @@ int modificarTamanhoEstruturaAuxiliar(int posicao, int novoTamanho)
   vetorPrincipal[posicao - 1].vetorAux = realloc(vetorPrincipal[posicao - 1].vetorAux, novoTamanhoTotal);
   
   vetorPrincipal[posicao - 1].tamanhoTotal = novoTamanhoTotal;
-  //printf("vetorPrincipal[posicao - 1].tamanhoTotal: %i\n", vetorPrincipal[posicao - 1].tamanhoTotal);
+
 
   if(vetorPrincipal[posicao - 1].tamanhoAtual > novoTamanhoTotal)
     vetorPrincipal[posicao - 1].tamanhoAtual = novoTamanhoTotal;
 
-    //printf("tam atual : %i\n", vetorPrincipal[posicao - 1].tamanhoAtual);
 
   return SUCESSO;
 }
@@ -409,8 +390,6 @@ int getQuantidadeElementosEstruturaAuxiliar(int posicao)
       return SEM_ESTRUTURA_AUXILIAR;
   
   
-  //printf("tamanho atual: %i\n", vetorPrincipal[posicao - 1].tamanhoAtual);
-  
   return vetorPrincipal[posicao - 1].tamanhoAtual;
 }
 
@@ -423,37 +402,34 @@ Retorno (No*)
 */
 No *montarListaEncadeadaComCabecote()
 {  
-  No* novo;
+  No* no_aux;
   No* inicio;
-  int i = 0;
-
-  //inicio->prox = novo; 
-
-  while(i < TAM){
-    if(vetorPrincipal[i].vetorAux){
-      if(vetorPrincipal[i].tamanhoAtual > 0){
-        for(int j = 0; j < vetorPrincipal[i].tamanhoAtual; j++){
-          
-          novo = (No*)malloc(sizeof(No));
+  int tamanho_soma = tamanhos_somados();
+  int vetorCopia[tamanho_soma];
   
-          if(novo){
-            novo->conteudo = vetorPrincipal[i].vetorAux[j];
-            novo = novo->prox; 
-          }
-          else{
-            printf("Não foi possível alocar novo nó\n");
-          }
-        }
-      }
-    }
-    else{
-      return NULL;
-    }
-    i++;
+  if(getDadosDeTodasEstruturasAuxiliares(vetorCopia) != SUCESSO){
+    return NULL;
   }
   
-    
+  inicio = (No*)malloc(sizeof(No));
+  
+  no_aux = inicio;
+  no_aux->prox = NULL;
+
+  if(inicio){
+    for(int i = 0; i < tamanho_soma; i++){
+      No* novo = (No*)malloc(sizeof(No));
+      novo->conteudo = vetorCopia[i];
+      novo->prox = NULL;
+      no_aux->prox = novo;
+      no_aux = novo;
+    }
+  }
+  else{
     return NULL;
+  }
+    
+    return inicio;
 }
 
 /*
@@ -462,6 +438,11 @@ Retorno void
 */
 void getDadosListaEncadeadaComCabecote(No *inicio, int vetorAux[])
 {
+  No* no = inicio->prox;
+
+  for(int i = 0; no != NULL; no = no->prox, i++){
+    vetorAux[i] = no->conteudo;
+  }
 }
 
 /*
@@ -473,6 +454,18 @@ Retorno
 */
 void destruirListaEncadeadaComCabecote(No **inicio)
 {
+  No* lixo = (*inicio)->prox;
+  No* proximo = lixo->prox;
+    
+    for(; proximo->prox != NULL; lixo = proximo->prox){
+      if(lixo->prox)
+        proximo = lixo->prox;
+      free(lixo);
+    }
+  
+    free(proximo); //free no ultimo proximo.
+   
+    *inicio = NULL;
 }
 
 /*
