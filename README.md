@@ -1,3 +1,3 @@
 # INF029-MatheusOliveiraHirth-
 
-Projeto Escola!
+Disciplina de Laboratório de Programação cursada em linguagem C.
