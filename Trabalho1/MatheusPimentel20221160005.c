@@ -267,6 +267,7 @@ DiasMesesAnos q2(char datainicial[], char datafinal[])
 {
 
     int i = 0, j = 0;
+    int diasMes[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     //calcule os dados e armazene nas três variáveis a seguir
     DiasMesesAnos dma;
@@ -318,6 +319,7 @@ DiasMesesAnos q2(char datainicial[], char datafinal[])
     	 	i++;
 	    }
       Ano_i[i] = '\0';
+        
       //###################### Maior ou menor #########################################
       if(atoi(Ano_f) < atoi(Ano_i)){
         dma.retorno = 4;
@@ -330,14 +332,25 @@ DiasMesesAnos q2(char datainicial[], char datafinal[])
       }
       else{
         dma.qtdAnos = atoi(Ano_f) - atoi(Ano_i);
-        
-        dma.qtdMeses = atoi(Mes_f) - atoi(Mes_i);
 
+        dma.qtdMeses = atoi(Mes_f) - atoi(Mes_i);
+        if(dma.qtdMeses < 0){
+          dma.qtdMeses = 0; 
+          dma.qtdAnos -= 1;
+        }
+        //quantidade de dias com checagem de bissexto
         dma.qtdDias = atoi(Dia_f) - atoi(Dia_i);
+        if(dma.qtdDias < 0){
+          dma.qtdDias = (diasMes[atoi(Mes_i) - 1] - atoi(Dia_i)) + atoi(Dia_f);
+          
+          if((((atoi(Ano_i) % 4 == 0) && (atoi(Ano_i) % 100 != 0)) || (atoi(Ano_i) % 400 == 0)) && atoi(Mes_i) == 2)
+            dma.qtdDias--;
+          
+          dma.qtdMeses -= 1;
+        }
         
         dma.retorno = 1;
       }
-    
     }
   
   return dma;  
@@ -367,7 +380,7 @@ int q3(char *texto, char c, int isCaseSensitive)
     for(i = 0; i < len; i++){
       if(isCaseSensitive != 1){
         if(c < 'Z' && c >= 'A'){
-          if(texto[i] == c - 32 || texto[i] == c){
+          if(texto[i] == c + 32 || texto[i] == c){
             qtdOcorrencias++;
           }
         }
@@ -405,7 +418,7 @@ int q3(char *texto, char c, int isCaseSensitive)
 int q4(char *strTexto, char *strBusca, int posicoes[30])
 {
   int i = 0, j = 0, i_copy, pos_inicial = 0, n = 0, cont = 1;
-  int qtdOcorrencias = -1;
+  int qtdOcorrencias = 0;
 
   for(i = 0; strTexto[i] != '\0'; i++){ //retirar a casa extra dos acentos
     if(strTexto[i] == -61){
@@ -416,30 +429,28 @@ int q4(char *strTexto, char *strBusca, int posicoes[30])
   }  
   
 
-   for(i = 0; strTexto[i] != '\0'; i++){
-  
+  for(i = 0; strTexto[i] != '\0'; i++){ 
+    
     if(strTexto[i] == strBusca[0]){
       pos_inicial = i;
       i_copy = i;
       for(j = 1; strBusca[j] != '\0'; j++){
-        i_copy++;
-        
+        i_copy++; 
         if(strTexto[i_copy] == strBusca[j]){
           if(strBusca[j + 1] == '\0'){
             posicoes[n] = pos_inicial + 1;
             posicoes[n + 1] = i_copy + 1;
             qtdOcorrencias = cont++;
             n += 2;
+            i = i_copy;
           }
         }
-          
-        else{
+        else
           break;
-        }
       }
     }
-  } 
-
+  }
+  
     return qtdOcorrencias;
 }
 
@@ -501,52 +512,37 @@ int q6(int numerobase, int numerobusca)
 
 
   for(TAM = 0; num_aux > 0; TAM++){ //contando o tamanho
-      
     num_aux /= 10;
   }
   
-  
   int casas[TAM];
   
-  
   for(i = TAM - 1; i >= 0; i--){  //atribuindo(ordem correta)
-    
     casas[i] = numerobase % 10;
-    
     numerobase /= 10;
   }
 
   //repetindo para o número de busca num vetor
 
   for(TAM1 = 0; num_aux1 > 0; TAM1++){ //contando o tamanho
-      
     num_aux1 /= 10;
   }
   
-  
   int casas_busca[TAM1];
   
-  
   for(i = TAM1 - 1; i >= 0; i--){  //atribuindo(ordem correta)
-    
     casas_busca[i] = numerobusca % 10;
-    
     numerobusca /= 10;
   }
   
-  
   for(i = 0; i < TAM; i++){          //buscando!
-    
     j = 0;
-  
     while(casas_busca[j] == casas[i] && j < TAM1){
-        
       if(j == (TAM1 - 1) && casas_busca[j] == casas[i]){
           qtdOcorrencias++;
       }
-      
       j++;
-      i++;
+      i += TAM1 - 1;
     }  
   }
   
